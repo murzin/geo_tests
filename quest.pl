@@ -84,7 +84,7 @@ while (1) {
     my $q;
     if (! $rand) {
         $q = $start++;
-        last if $q > $stop;
+        last if $q >= $stop;
     } else {
         $q = $start + int(rand($stop-$start+1)) - 1;
     }
