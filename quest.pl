@@ -148,14 +148,8 @@ sub randomize_answers {
     $new{$anum{$rand_l[1]}} =~ s/ბ\)/$anum{$rand_l[1]}/;
     $new{$anum{$rand_l[2]}} =~ s/გ\)/$anum{$rand_l[2]}/;
     $new{$anum{$rand_l[3]}} =~ s/დ\)/$anum{$rand_l[3]}/;
-    $q->{'ა)_old'} = $q->{'ა)'};
-    $q->{'ბ)_old'} = $q->{'ბ)'};
-    $q->{'გ)_old'} = $q->{'გ)'};
-    $q->{'დ)_old'} = $q->{'დ)'};
-    $q->{'ა)'} = $new{'ა)'};
-    $q->{'ბ)'} = $new{'ბ)'};
-    $q->{'გ)'} = $new{'გ)'};
-    $q->{'დ)'} = $new{'დ)'};
+    $q->{$_.'_old'} = $q->{$_} for qw{ა) ბ) გ) დ)};
+    $q->{$_} = $new{$_} for qw{ა) ბ) გ) დ)};
 
     return $q;
 }
