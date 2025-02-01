@@ -134,16 +134,8 @@ while (1) {
 sub randomize_answers {
     my $q = $questions{+shift};
     my @rand_l = shuffle (1..4);
-    my $right_answer_num = {reverse %anum}->{$q->{answer}};
-    my $new_ran = $rand_l[$right_answer_num - 1];
-    $q->{answer_old} = $q->{answer};
-    $q->{answer} = $anum{$new_ran};
+    $q->{answer} = $anum{$rand_l[{reverse %anum}->{$q->{answer}} - 1]};
     my %new;
-    for my $i (1..4) {
-        $new{$anum{$rand_l[$i-1]}} = $q->{$anum{$i}};
-        $new{$anum{$rand_l[$i-1]}} =~ s/\Q$anum{$i}\E/$anum{$rand_l[$i-1]}/;
-    }
-    $q->{$_.'_old'} = $q->{$_}, $q->{$_} = $new{$_} for values %anum;
-
-    return $q;
+    ($new{$anum{$rand_l[$_-1]}} = $q->{$anum{$_}}) =~ s/\Q$anum{$_}\E/$anum{$rand_l[$_-1]}/ for 1..4;
+    $q->{$_} = $new{$_} for values %anum;
 }
