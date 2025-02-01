@@ -4,6 +4,14 @@ use common::sense;
 use autodie;
 use Data::Dumper;
 
+binmode STDOUT, ':utf8'; no warnings 'redefine';
+local *Data::Dumper::qquote = sub { qq["${\(shift)}"] };
+local $Data::Dumper::Useperl = 1;
+local $Data::Dumper::Sortkeys = 1;
+sub dumper { Data::Dumper->new([@_])->Indent(1)->Sortkeys(1)->Terse(1)->Useqq(1)->Dump }
+
+use List::Util q{shuffle};
+
 my $q_file = 'kart_quest.txt';
 my %anum = qw{1 ა) 2 ბ) 3 გ) 4 დ)};
 
@@ -57,7 +65,6 @@ while (<$F>) {
     }
     $cur_text.= $_.' ';
 }
-
 close $F;
 
 #for my $qn (@order) {
@@ -101,6 +108,7 @@ while (1) {
         $q = $start + int(rand($stop-$start+1)) - 1;
     }
     my $qnum = $order[$q];
+    randomize_answers($qnum);
     say $questions{$qnum}{title};
     say $questions{$qnum}{text};
     say $questions{$qnum}{'ა)'};
@@ -123,3 +131,31 @@ while (1) {
     say; say;
 }
 
+sub randomize_answers {
+    my $qnum = shift;
+    my $q = $questions{$qnum};
+    my @rand_l = shuffle (1..4);
+    my $right_answer_num = {reverse %anum}->{$q->{answer}};
+    my $new_ran = $rand_l[$right_answer_num - 1];
+    $q->{answer_old} = $q->{answer};
+    $q->{answer} = $anum{$new_ran};
+    my %new;
+    $new{$anum{$rand_l[0]}} = $q->{'ა)'};
+    $new{$anum{$rand_l[1]}} = $q->{'ბ)'};
+    $new{$anum{$rand_l[2]}} = $q->{'გ)'};
+    $new{$anum{$rand_l[3]}} = $q->{'დ)'};
+    $new{$anum{$rand_l[0]}} =~ s/ა\)/$anum{$rand_l[0]}/;
+    $new{$anum{$rand_l[1]}} =~ s/ბ\)/$anum{$rand_l[1]}/;
+    $new{$anum{$rand_l[2]}} =~ s/გ\)/$anum{$rand_l[2]}/;
+    $new{$anum{$rand_l[3]}} =~ s/დ\)/$anum{$rand_l[3]}/;
+    $q->{'ა)_old'} = $q->{'ა)'};
+    $q->{'ბ)_old'} = $q->{'ბ)'};
+    $q->{'გ)_old'} = $q->{'გ)'};
+    $q->{'დ)_old'} = $q->{'დ)'};
+    $q->{'ა)'} = $new{'ა)'};
+    $q->{'ბ)'} = $new{'ბ)'};
+    $q->{'გ)'} = $new{'გ)'};
+    $q->{'დ)'} = $new{'დ)'};
+
+    return $q;
+}
