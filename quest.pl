@@ -71,7 +71,19 @@ close $F;
 #}
 
 my ($start, $stop, $rand, $answer);
+my $stat_file = "stat_file";
+my $stat;
+if (-f $stat_file) {
+    open my $f, "<", $stat_file or die;
+    local $/;
+    my $VAR1;
+    $stat = eval <$f>;
+    say $@ and exit if $@;
+    close $f;
+}
 
+#print Dumper $stat;
+#say "ee";exit;
 print "from: "; $start = <>; chomp $start;
 print "to : "; $stop = <>; chomp $stop;
 print "rand?: "; $rand = <>; chomp $rand;
@@ -99,6 +111,14 @@ while (1) {
     $answer = <>; chomp $answer;
     say "answer: ".$anum{$answer};
     say "right answer: ".$questions{$qnum}{answer};
+    if ($anum{$answer} eq $questions{$qnum}{answer}) {
+        $stat->{$qnum}{ok}++;
+    } else {
+        $stat->{$qnum}{no}++;
+    }
+    open my $f, ">", $stat_file or die;
+    print $f Dumper $stat;
+    close $f or die;
     <>;
     say; say;
 }
