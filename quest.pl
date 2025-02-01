@@ -134,7 +134,7 @@ while (1) {
 sub randomize_answers {
     my $q = $questions{+shift};
     my @rand_l = shuffle (1..4);
-    $q->{answer} = $anum{$rand_l[{reverse %anum}->{$q->{answer}} - 1]};
+    $q->{$_} = $anum{$rand_l[{reverse %anum}->{$q->{$_}} - 1]} for qw(answer);
     my %new;
     ($new{$anum{$rand_l[$_-1]}} = $q->{$anum{$_}}) =~ s/\Q$anum{$_}\E/$anum{$rand_l[$_-1]}/ for 1..4;
     $q->{$_} = $new{$_} for values %anum;
