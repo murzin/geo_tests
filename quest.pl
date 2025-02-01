@@ -132,24 +132,18 @@ while (1) {
 }
 
 sub randomize_answers {
-    my $qnum = shift;
-    my $q = $questions{$qnum};
+    my $q = $questions{+shift};
     my @rand_l = shuffle (1..4);
     my $right_answer_num = {reverse %anum}->{$q->{answer}};
     my $new_ran = $rand_l[$right_answer_num - 1];
     $q->{answer_old} = $q->{answer};
     $q->{answer} = $anum{$new_ran};
     my %new;
-    $new{$anum{$rand_l[0]}} = $q->{'ა)'};
-    $new{$anum{$rand_l[1]}} = $q->{'ბ)'};
-    $new{$anum{$rand_l[2]}} = $q->{'გ)'};
-    $new{$anum{$rand_l[3]}} = $q->{'დ)'};
-    $new{$anum{$rand_l[0]}} =~ s/ა\)/$anum{$rand_l[0]}/;
-    $new{$anum{$rand_l[1]}} =~ s/ბ\)/$anum{$rand_l[1]}/;
-    $new{$anum{$rand_l[2]}} =~ s/გ\)/$anum{$rand_l[2]}/;
-    $new{$anum{$rand_l[3]}} =~ s/დ\)/$anum{$rand_l[3]}/;
-    $q->{$_.'_old'} = $q->{$_} for qw{ა) ბ) გ) დ)};
-    $q->{$_} = $new{$_} for qw{ა) ბ) გ) დ)};
+    for my $i (1..4) {
+        $new{$anum{$rand_l[$i-1]}} = $q->{$anum{$i}};
+        $new{$anum{$rand_l[$i-1]}} =~ s/\Q$anum{$i}\E/$anum{$rand_l[$i-1]}/;
+    }
+    $q->{$_.'_old'} = $q->{$_}, $q->{$_} = $new{$_} for values %anum;
 
     return $q;
 }
