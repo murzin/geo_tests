@@ -108,7 +108,7 @@ while (1) {
         $q = $start + int(rand($stop-$start+1)) - 1;
     }
     my $qnum = $order[$q];
-    randomize_answers($qnum);
+    randomize_questions($qnum);
     say $questions{$qnum}{title};
     say $questions{$qnum}{text};
     say $questions{$qnum}{'ა)'};
@@ -131,9 +131,9 @@ while (1) {
     say; say;
 }
 
-sub randomize_answers {
+sub randomize_questions {
     my $q = $questions{+shift};
-    my @rand_l = shuffle (1..4);
+    my @rand_l = shuffle 1..4;
     $q->{$_} = $anum{$rand_l[{reverse %anum}->{$q->{$_}} - 1]} for qw(answer);
     my %new;
     ($new{$anum{$rand_l[$_-1]}} = $q->{$anum{$_}}) =~ s/\Q$anum{$_}\E/$anum{$rand_l[$_-1]}/ for 1..4;
