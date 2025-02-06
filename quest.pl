@@ -78,6 +78,13 @@ close $F;
 #}
 
 my ($start, $stop, $rand, $answer);
+if (@ARGV) {
+    $start = 0 + shift @ARGV;
+    $stop = 0 + shift @ARGV;
+    unless ($start > 0 && $start < $stop) {
+        undef $start, $stop;
+    }
+}
 my $stat_file = "stat_file";
 my $stat;
 if (-f $stat_file) {
@@ -91,8 +98,8 @@ if (-f $stat_file) {
 
 #print Dumper $stat;
 #say "ee";exit;
-print "from: "; $start = <>; chomp $start;
-print "to : "; $stop = <>; chomp $stop;
+print "from: " and $start = <> and chomp $start unless $start;
+print "to : " and $stop = <> and chomp $stop unless $stop;
 print "rand?: "; $rand = <>; chomp $rand;
 $start = 1 unless $start;
 $stop = 200 unless $stop;
@@ -103,7 +110,7 @@ while (1) {
     my $q;
     if (! $rand) {
         $q = $start++;
-        last if $q >= $stop;
+        last if $q == $stop;
     } else {
         $q = $start + int(rand($stop-$start+1)) - 1;
     }
