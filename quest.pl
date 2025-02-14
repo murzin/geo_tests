@@ -106,13 +106,18 @@ $stop = 200 unless $stop;
 
 say "start: $start stop: $stop";
 $start-- unless $rand;
+my @q_rands;
 while (1) {
     my $q;
     if (! $rand) {
         $q = $start++;
         last if $q == $stop;
     } else {
-        $q = $start + int(rand($stop-$start+1)) - 1;
+        unless (@q_rands) {
+            @q_rands = shuffle $start .. $stop;
+        }
+        #$q = $start + int(rand($stop-$start+1)) - 1;
+        $q = shift(@q_rands) - 1;
     }
     my $qnum = $order[$q];
     randomize_questions($qnum);
