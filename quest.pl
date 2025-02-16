@@ -3,24 +3,23 @@
 use common::sense;
 use autodie;
 use Data::Dumper;
-
-binmode STDOUT, ':utf8'; no warnings 'redefine';
-local *Data::Dumper::qquote = sub { qq["${\(shift)}"] };
-local $Data::Dumper::Useperl = 1;
-local $Data::Dumper::Sortkeys = 1;
-sub dumper { Data::Dumper->new([@_])->Indent(1)->Sortkeys(1)->Terse(1)->Useqq(1)->Dump }
-
 use List::Util q{shuffle};
 
+binmode STDOUT, ':utf8';
+
+no warnings 'redefine';
+local *Data::Dumper::qquote = sub { qq["${\(shift)}"] };
+use warnings 'redefine';
+local $Data::Dumper::Useperl = 1;
+local $Data::Dumper::Sortkeys = 1;
+
 my $q_file = 'kart_quest.txt';
-my %anum = qw{1 ა) 2 ბ) 3 გ) 4 დ)};
+my @abgd = qw{ა) ბ) გ) დ)};
+my %anum = map {$_ => $abgd[$_-1]} 1..4;
 
-my %questions;
-my @order;
+my (%questions, @order, $cur_quest, $cur_text);
+
 open my $F, '<:utf8', $q_file;
-
-my $cur_quest;
-my $cur_text;
 while (<$F>) {
     chomp;
     next unless $_;
@@ -88,7 +87,7 @@ if (@ARGV) {
 my $stat_file = "stat_file";
 my $stat;
 if (-f $stat_file) {
-    open my $f, "<", $stat_file or die;
+    open my $f, "<", $stat_file;
     local $/;
     my $VAR1;
     $stat = eval <$f>;
@@ -96,8 +95,6 @@ if (-f $stat_file) {
     close $f;
 }
 
-#print Dumper $stat;
-#say "ee";exit;
 print "from: " and $start = <> and chomp $start unless $start;
 print "to : " and $stop = <> and chomp $stop unless $stop;
 print "rand?: "; $rand = <>; chomp $rand;
@@ -116,17 +113,13 @@ while (1) {
         unless (@q_rands) {
             @q_rands = shuffle $start .. $stop;
         }
-        #$q = $start + int(rand($stop-$start+1)) - 1;
         $q = shift(@q_rands) - 1;
     }
     my $qnum = $order[$q];
     randomize_questions($qnum);
     say $questions{$qnum}{title};
     say $questions{$qnum}{text};
-    say $questions{$qnum}{'ა)'};
-    say $questions{$qnum}{'ბ)'};
-    say $questions{$qnum}{'გ)'};
-    say $questions{$qnum}{'დ)'};
+    say $questions{$qnum}{$_} for values @abgd;
     say; print"? ";
     $answer = <>; chomp $answer;
     say "answer: ".$anum{$answer};
@@ -136,9 +129,9 @@ while (1) {
     } else {
         $stat->{$qnum}{no}++;
     }
-    open my $f, ">", $stat_file or die;
+    open my $f, ">", $stat_file;
     print $f Dumper $stat;
-    close $f or die;
+    close $f;
     <>;
     say; say;
 }
@@ -149,5 +142,5 @@ sub randomize_questions {
     $q->{$_} = $anum{$rand_l[{reverse %anum}->{$q->{$_}} - 1]} for qw(answer);
     my %new;
     ($new{$anum{$rand_l[$_-1]}} = $q->{$anum{$_}}) =~ s/\Q$anum{$_}\E/$anum{$rand_l[$_-1]}/ for 1..4;
-    $q->{$_} = $new{$_} for values %anum;
+    $q->{$_} = $new{$_} for @abgd;
 }
