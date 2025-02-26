@@ -110,7 +110,7 @@ while (@q and my $qnum = $order[shift @q]) {
     say $questions{$qnum}{title};
     say $questions{$qnum}{text};
     say $questions{$qnum}{$_} for values @abgd;
-    say; print"? ";
+    say; print"[1-4]? ";
     $answer = <>; chomp $answer;
     say "answer: ".$anum{$answer};
     say "right answer: ".$questions{$qnum}{answer};
