@@ -97,7 +97,8 @@ if (-f $stat_file) {
 
 print "from: " and $start = <> and chomp $start unless $start;
 print "to : " and $stop = <> and chomp $stop unless $stop;
-print "rand?: "; $rand = <>; chomp $rand;
+#print "rand?: "; $rand = <>; chomp $rand;
+$rand = 1;
 $start = 1 unless $start;
 $stop = 200 unless $stop;
 
