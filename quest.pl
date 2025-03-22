@@ -76,8 +76,11 @@ close $F;
 #    say "ANSWER: ".$questions{$qn}{answer};
 #}
 
+my $STAT_MODE;
+
 my ($start, $stop, $rand, $answer);
-if (@ARGV) {
+$STAT_MODE = 1 if $ARGV[0] eq 'stat';
+if (@ARGV && ! $STAT_MODE) {
     $start = 0 + shift @ARGV;
     $stop = 0 + shift @ARGV;
     unless ($start > 0 && $start < $stop) {
@@ -95,15 +98,29 @@ if (-f $stat_file) {
     close $f;
 }
 
-print "from: " and $start = <> and chomp $start unless $start;
-print "to : " and $stop = <> and chomp $stop unless $stop;
+if ($STAT_MODE) {
+    shift @ARGV;
+    say "STAT MODE";
+    my %q_tmp = ();
+    for (keys %$stat) {
+        $q_tmp{$_} = $questions{$_} if $stat->{$_}{no};
+    }
+    print scalar keys %q_tmp;
+    say " questions";
+    $start = 0;
+    $stop = scalar(keys %q_tmp) - 1;
+    @order = keys %q_tmp;
+    %questions = %q_tmp;
+} else {
+    print "from: " and $start = <> and chomp $start unless $start;
+    print "to : " and $stop = <> and chomp $stop unless $stop;
+    $start = 1 unless $start;
+    $stop = 200 unless $stop;
+    say "start: $start stop: $stop";
+    $start--; $stop--;
+}
 #print "rand?: "; $rand = <>; chomp $rand;
 $rand = 1;
-$start = 1 unless $start;
-$stop = 200 unless $stop;
-
-say "start: $start stop: $stop";
-$start--; $stop--;
 my @q = $start .. $stop; @q = shuffle @q if $rand;
 while (@q and my $qnum = $order[shift @q]) {
     randomize_questions($qnum);
@@ -119,9 +136,11 @@ while (@q and my $qnum = $order[shift @q]) {
     } else {
         $stat->{$qnum}{no}++;
     }
-    open my $f, ">", $stat_file;
-    print $f Dumper $stat;
-    close $f;
+    if ( ! $STAT_MODE) {
+        open my $f, ">", $stat_file;
+        print $f Dumper $stat;
+        close $f;
+    }
     <>;
     say; say;
 }
